@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:juniorvoca/styles/colors.dart';
+import 'package:juniorvoca/styles/theme.dart';
+import 'package:juniorvoca/widgets/progress_indicator.dart';
 
-class JuvoAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const JuvoAppBar({super.key});
+class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const MainAppBar({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -20,6 +22,62 @@ class JuvoAppBar extends StatelessWidget implements PreferredSizeWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class ProgressAppbar extends StatelessWidget{
+
+  const ProgressAppbar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    
+    double value = 0.5;
+    final double screenTop = MediaQuery.of(context).padding.top;
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.backgroundPrimary,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColor,
+            blurRadius: 3,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      height: 110.0,
+      // 상태바 높이만큼 위쪽 여백 추가
+      padding: EdgeInsets.only(top: screenTop), 
+      child: Row(
+        children: [
+          // 뒤로가기 버튼
+          IconButton(
+            color: AppColors.textPrimary,
+            icon: const Icon(Icons.arrow_back_ios_new_sharp), 
+            onPressed: (){
+              // 메인으로 이동
+            },
+          ),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // 학습하기 텍스트
+                const Text(
+                  '학습하기',
+                  style: AppTheme.titleMedium,  
+                ),
+                const SizedBox(height: 10,),
+                // 진행바
+                CustomProgressIndicator(value: value),
+              ],
+            ),
+          ), 
+        ],
+      ),
     );
   }
 }

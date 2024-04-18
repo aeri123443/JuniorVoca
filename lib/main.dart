@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:juniorvoca/screens/home_page.dart';
+// import 'package:juniorvoca/screens/home_page.dart';
 import 'package:juniorvoca/styles/colors.dart';
-
+import 'package:juniorvoca/screens/learning_page.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         scaffoldBackgroundColor: AppColors.backgroundPrimary,
       ),
-      home: const HomePage(userName: '홍길동'), // 사용자 이름을 전달
+      home: const LearningPage(userName: '홍길동'), // 사용자 이름을 전달
     );
   }
 }

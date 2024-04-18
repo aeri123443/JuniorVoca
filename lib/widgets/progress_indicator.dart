@@ -61,12 +61,45 @@ class MainProgressIndicator extends StatelessWidget{
               },
               child: const Text(
                 '학습 이어하기 >',
-                style: AppTheme.subText
+                style: AppTheme.caption
               ),
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+class CustomProgressIndicator extends StatelessWidget{
+
+  final double value;
+
+  const CustomProgressIndicator({
+    super.key,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.fromLTRB(30, 2, 30, 2),
+          child: LinearProgressIndicator(
+            value: value,
+            borderRadius: BorderRadius.circular(10),
+            backgroundColor: AppColors.shadowColor,
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.colorPrimaryDefault),
+          ),
+        ),
+        const Text(
+          '10/20',
+          style: AppTheme.caption,  
+        ),
+      ],
+    );
+    
+   
   }
 }

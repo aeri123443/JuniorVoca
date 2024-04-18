@@ -5,6 +5,14 @@ class AppTheme {
   static const primaryFont = "Pretendard";
   static const double primaryLetterSpacing = -0.8;
 
+    static const TextStyle headline1Bold = TextStyle(
+    fontFamily: primaryFont,
+    fontSize: 32,
+    letterSpacing: primaryLetterSpacing,
+    fontWeight: FontWeight.w900,
+    color: AppColors.textPrimary,
+  );
+
   static const TextStyle headlineMedium = TextStyle(
     fontFamily: primaryFont,
     fontSize: 22,
@@ -23,9 +31,9 @@ class AppTheme {
 
     static const TextStyle titleMedium = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 20,
+    fontSize: 22,
     letterSpacing: primaryLetterSpacing,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w800,
     color: AppColors.textPrimary,
   );
 
@@ -45,15 +53,15 @@ class AppTheme {
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle subText = TextStyle(
+  static const TextStyle caption = TextStyle(
     fontFamily: primaryFont,
-    fontSize: 14,
+    fontSize: 12,
     letterSpacing: primaryLetterSpacing,
     fontWeight: FontWeight.w600,
     color: AppColors.textSecondary,
   );
 
-    static const TextStyle subText2 = TextStyle(
+    static const TextStyle caption2 = TextStyle(
     fontFamily: primaryFont,
     fontSize: 18,
     letterSpacing: primaryLetterSpacing,
