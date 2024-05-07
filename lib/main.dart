@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 // import 'package:juniorvoca/screens/home_page.dart';
 import 'package:juniorvoca/styles/colors.dart';
 import 'package:juniorvoca/screens/learning_page.dart';
+
 void main() {
   runApp(const MyApp());
 }

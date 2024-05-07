@@ -1,0 +1,28 @@
+[
+    {
+      "image": "assets/images/card_pencil.png",
+      "word": "Pencil",
+      "meaning": "연필"
+    },
+    {
+      "image": "assets/images/card_banana.png",
+      "word": "Banana",
+      "meaning": "바나나"
+    },
+    {
+      "image": "assets/images/card_cat.png",
+      "word": "Cat",
+      "meaning": "고양이"
+    },
+    {
+      "image": "assets/images/card_dog.png",
+      "word": "Dog",
+      "meaning": "강아지"
+    },
+    {
+      "image": "assets/images/card_scissors.png",
+      "word": "Scissors",
+      "meaning": "가위"
+    }
+  ]
+  

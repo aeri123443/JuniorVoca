@@ -27,13 +27,19 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class ProgressAppbar extends StatelessWidget{
+  final int currentIndex;
+  final int totalCount;
 
-  const ProgressAppbar({super.key});
+  const ProgressAppbar({
+    super.key,
+    required this.currentIndex,
+    required this.totalCount,
+  });
 
   @override
   Widget build(BuildContext context) {
     
-    double value = 0.5;
+    double value = ( currentIndex + 1 ) / totalCount;
     final double screenTop = MediaQuery.of(context).padding.top;
 
     return Container(
@@ -72,7 +78,11 @@ class ProgressAppbar extends StatelessWidget{
                 ),
                 const SizedBox(height: 10,),
                 // 진행바
-                CustomProgressIndicator(value: value),
+                CustomProgressIndicator(
+                  value: value,
+                  currentIndex: currentIndex,
+                  totalCount: totalCount,
+                ),
               ],
             ),
           ), 

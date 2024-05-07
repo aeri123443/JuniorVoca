@@ -74,14 +74,19 @@ class MainProgressIndicator extends StatelessWidget{
 class CustomProgressIndicator extends StatelessWidget{
 
   final double value;
+  final int currentIndex;
+  final int totalCount;
 
   const CustomProgressIndicator({
     super.key,
     required this.value,
+    required this.currentIndex,
+    required this.totalCount,
   });
 
   @override
   Widget build(BuildContext context) {
+
     return Column(
       children: [
         Container(
@@ -93,13 +98,11 @@ class CustomProgressIndicator extends StatelessWidget{
             valueColor: const AlwaysStoppedAnimation<Color>(AppColors.colorPrimaryDefault),
           ),
         ),
-        const Text(
-          '10/20',
+        Text(
+          '${currentIndex+1}/$totalCount',
           style: AppTheme.caption,  
         ),
       ],
     );
-    
-   
   }
 }
