@@ -301,4 +301,4 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
-}//...
+}
