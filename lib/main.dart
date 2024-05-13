@@ -32,7 +32,10 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              // 설정 버튼을 누르면 설정 화면으로 이동하는 기능을 추가.
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsPage()),
+              );
             },
           ),
         ],
@@ -47,11 +50,23 @@ class HomePage extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
-            _buildStudyItem('A 영어 학습', 0.7),
+            StudyItem(
+              label: 'A 영어 학습',
+              initialValue: 0.7,
+              page: GeneralStudyPage(), // 일반 학습 페이지 연결
+            ),
             SizedBox(height: 20),
-            _buildStudyItem('가 한국어 학습', 0.5),
+            StudyItem(
+              label: '가 한국어 학습',
+              initialValue: 0.5,
+              page: ParentVoiceStudyPage(), // 부모 목소리 학습 페이지 연결
+            ),
             SizedBox(height: 20),
-            _buildStudyItem('A가 영어+한국어 동시 학습', 0.8),
+            StudyItem(
+              label: 'A가 영어+한국어 동시 학습',
+              initialValue: 0.8,
+              page: WordExampleStudyPage(), // 단어와 예문 학습 페이지 연결
+            ),
             SizedBox(height: 20),
             Expanded(
               child: GridView.count(
@@ -59,10 +74,10 @@ class HomePage extends StatelessWidget {
                 mainAxisSpacing: 20,
                 crossAxisSpacing: 20,
                 children: [
-                  _buildStudyArea('일반 학습'),
-                  _buildStudyArea('부모 목소리 학습'),
-                  _buildStudyArea('단어와 예문 학습'),
-                  _buildStudyArea('음성인식 AI 테스트'),
+                  _buildStudyArea(context, '일반 학습', GeneralStudyPage()), // 일반 학습 페이지 연결
+                  _buildStudyArea(context, '부모 목소리 학습', ParentVoiceStudyPage()), // 부모 목소리 학습 페이지 연결
+                  _buildStudyArea(context, '단어와 예문 학습', WordExampleStudyPage()), // 단어와 예문 학습 페이지 연결
+                  _buildStudyArea(context, '음성인식 AI 테스트', VoiceRecognitionTestPage()), // 음성인식 AI 테스트 페이지 연결
                 ],
               ),
             ),
@@ -94,7 +109,60 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildStudyItem(String label, double value) {
+  Widget _buildStudyArea(BuildContext context, String title, Widget page) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Center(
+          child: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class StudyItem extends StatefulWidget {
+  final String label;
+  final double initialValue;
+  final Widget page;
+
+  StudyItem({Key? key, required this.label, required this.initialValue, required this.page})
+      : super(key: key);
+
+  @override
+  _StudyItemState createState() => _StudyItemState();
+}
+
+class _StudyItemState extends State<StudyItem> {
+  late double _progress;
+
+  @override
+  void initState() {
+    super.initState();
+    _progress = widget.initialValue;
+  }
+
+  void updateProgress(double newValue) {
+    setState(() {
+      _progress = newValue;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(2),
       decoration: BoxDecoration(
@@ -105,27 +173,37 @@ class HomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
+            widget.label,
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 8),
           Stack(
             children: [
               LinearProgressIndicator(
-                value: value,
+                value: _progress,
                 backgroundColor: Colors.grey[300],
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
               ),
-              Positioned.fill(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
+              Align(
+                alignment: Alignment(_progress * 2 - 1, -1), // 게이지 바 끝 부분에 말풍선 정렬
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                        bottomLeft: Radius.circular(16),
+                      ),
+                    ),
                     child: Text(
-                      '${(value * 100).toInt()}%',
+                      '${(_progress * 100).toInt()}%',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -153,19 +231,73 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildStudyArea(String title) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(10),
+class GeneralStudyPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('일반 학습'),
       ),
-      child: Center(
-        child: Text(
-          title,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
+      body: Center(
+        child: Text('일반 학습 페이지'),
+      ),
+    );
+  }
+}
+
+class ParentVoiceStudyPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('부모 목소리 학습'),
+      ),
+      body: Center(
+        child: Text('부모 목소리 학습 페이지'),
+      ),
+    );
+  }
+}
+
+class WordExampleStudyPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('단어와 예문 학습'),
+      ),
+      body: Center(
+        child: Text('단어와 예문 학습 페이지'),
+      ),
+    );
+  }
+}
+
+class VoiceRecognitionTestPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('음성인식 AI 테스트'),
+      ),
+      body: Center(
+        child: Text('음성인식 AI 테스트 페이지'),
+      ),
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('설정'),
+      ),
+      body: Center(
+        child: Text('설정 페이지'),
       ),
     );
   }
