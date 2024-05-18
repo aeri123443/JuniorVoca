@@ -6,6 +6,7 @@ import 'package:juniorvoca/widgets/bottomnavbar.dart';
 import 'package:juniorvoca/widgets/appbar.dart';
 import 'package:juniorvoca/widgets/image_card.dart';
 import 'package:juniorvoca/widgets/icon_button.dart';
+import 'package:juniorvoca/utils/simple_recorder.dart';
 
 class VocaItem {
   final String image;
@@ -43,13 +44,15 @@ class LearningPage extends StatefulWidget {
 class _LearningPageState extends State<LearningPage> {
   List<VocaItem> vocaItems = [];
   int _currentIndex = 0;
-  final PageController _pageController = PageController();
   bool _dataLoaded = false;
+  final PageController _pageController = PageController();
+  final simpleRecorder = SimpleRecorder();
 
   @override
   void initState() {
     super.initState();
     loadData();
+    simpleRecorder.init();
   }
 
   // 데이터 로드 후 VocaItem 객체로 변환
@@ -124,18 +127,22 @@ class _LearningPageState extends State<LearningPage> {
                         ],
                       ),
                       // 버튼 모음
-                      const SizedBox(
+                      SizedBox(
                         width: double.infinity,
                         height: 150,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            // 스피커 버튼
                             LargeIconButton(
                               icon: Icons.volume_down_rounded,
+                              onPressed: () => (simpleRecorder.getPlaybackFn() ?? () {})(),
                             ),
+                            // 마이크 버튼
                             LargeIconButton(
                               icon: Icons.keyboard_voice_rounded,
                               iconSize: 120,
+                              onPressed: () => (simpleRecorder.getRecorderFn() ?? () {})(),
                             ),
                           ],
                         ),
