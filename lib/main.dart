@@ -2,8 +2,16 @@ import 'package:flutter/material.dart';
 // import 'package:juniorvoca/screens/home_page.dart';
 import 'package:juniorvoca/styles/colors.dart';
 import 'package:juniorvoca/screens/learning_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:logger/logger.dart';
 
-void main() {
+void main() async {
+    try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    var logger = Logger();
+    logger.e('Error loading .env file: $e');
+  }
   runApp(const MyApp());
 }
 
@@ -19,7 +27,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         scaffoldBackgroundColor: AppColors.backgroundPrimary,
       ),
-      home: const LearningPage(userName: '홍길동'), // 사용자 이름을 전달
+      home: const LearningPage(userName: '홍길동'),
     );
   }
 }

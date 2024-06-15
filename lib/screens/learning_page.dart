@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:juniorvoca/styles/colors.dart';
 import 'package:juniorvoca/styles/theme.dart';
-import 'package:juniorvoca/widgets/bottomnavbar.dart';
 import 'package:juniorvoca/widgets/appbar.dart';
-import 'package:juniorvoca/widgets/image_card.dart';
+import 'package:juniorvoca/widgets/bottomnavbar.dart';
 import 'package:juniorvoca/widgets/icon_button.dart';
+import 'package:juniorvoca/widgets/image_card.dart';
+import 'package:juniorvoca/utils/simple_recorder.dart';
 
 class VocaItem {
   final String image;
@@ -43,13 +45,21 @@ class LearningPage extends StatefulWidget {
 class _LearningPageState extends State<LearningPage> {
   List<VocaItem> vocaItems = [];
   int _currentIndex = 0;
-  final PageController _pageController = PageController();
   bool _dataLoaded = false;
+  final PageController _pageController = PageController();
+  final simpleRecorder = SimpleRecorder();
+  String transcription = "";
 
   @override
   void initState() {
     super.initState();
     loadData();
+    simpleRecorder.init();
+    simpleRecorder.setTranscriptionCallback((String result) {
+      setState(() {
+        transcription = result;
+      });
+    });
   }
 
   // 데이터 로드 후 VocaItem 객체로 변환
@@ -105,37 +115,49 @@ class _LearningPageState extends State<LearningPage> {
                             ),
                           ),
                           Text(
-                            vocaItems[index].word,
-                            style: AppTheme.headline1Bold,
+                            transcription.isNotEmpty
+                                ? transcription
+                                : '____',
+                            style: AppTheme.headline1Bold.copyWith(
+                              color: AppColors.colorPrimaryDefault,
+                            ),
                           ),
                         ],
                       ),
                       // 예문
-                      const Column(
+                      Column(
                         children: [
-                          Text(
+                          const Text(
                             '어제 연필을 하나 샀어요.',
                             style: AppTheme.body,
                           ),
                           Text(
-                            'I bought one pencil yesterday.',
+                            transcription.isNotEmpty
+                                ? transcription
+                                : 'Recording transcription will appear here',
                             style: AppTheme.body,
                           ),
                         ],
                       ),
                       // 버튼 모음
-                      const SizedBox(
+                      SizedBox(
                         width: double.infinity,
                         height: 150,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            // 스피커 버튼
                             LargeIconButton(
                               icon: Icons.volume_down_rounded,
+                              onPressed: () =>
+                                  (simpleRecorder.getPlaybackFn() ?? () {})(),
                             ),
+                            // 마이크 버튼
                             LargeIconButton(
                               icon: Icons.keyboard_voice_rounded,
                               iconSize: 120,
+                              onPressed: () =>
+                                  (simpleRecorder.getRecorderFn() ?? () {})(),
                             ),
                           ],
                         ),
