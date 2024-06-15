@@ -1,17 +1,20 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
-import 'dart:convert'; // 추가된 부분
-import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:audio_session/audio_session.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:path_provider/path_provider.dart'; // 임시 디렉토리 접근을 위해 추가
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-String ipAddress = '000.000.000.000'; // IP 정보 입력 필요
 typedef Fn = void Function();
+typedef TranscriptionCallback = void Function(String transcription); // 콜백 타입 정의
 const theSource = AudioSource.microphone;
+var logger = Logger();
 
 class SimpleRecorder {
   Codec _codec = Codec.aacMP4;
@@ -21,6 +24,7 @@ class SimpleRecorder {
   bool _mPlayerIsInited = false;
   bool _mRecorderIsInited = false;
   bool _mplaybackReady = false;
+  TranscriptionCallback? _transcriptionCallback; // 콜백 변수
 
   Future<void> init() async {
     _mPlayer = FlutterSoundPlayer();
@@ -53,12 +57,9 @@ class SimpleRecorder {
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-      avAudioSessionCategoryOptions:
-          AVAudioSessionCategoryOptions.allowBluetooth |
-              AVAudioSessionCategoryOptions.defaultToSpeaker,
+      avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.allowBluetooth | AVAudioSessionCategoryOptions.defaultToSpeaker,
       avAudioSessionMode: AVAudioSessionMode.spokenAudio,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionRouteSharingPolicy: AVAudioSessionRouteSharingPolicy.defaultPolicy,
       avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
       androidAudioAttributes: const AndroidAudioAttributes(
         contentType: AndroidAudioContentType.speech,
@@ -125,41 +126,48 @@ class SimpleRecorder {
   void dispose() {
     _mPlayer!.closePlayer();
     _mPlayer = null;
-
     _mRecorder!.closeRecorder();
     _mRecorder = null;
   }
 
-  // 오디오 파일 업로드
   Future<void> _uploadAudio() async {
-    print("Running: _uploadAudio()");
     try {
+      // IP 주소를 가져온 후 POST 요청 생성
+      final ipAddress = dotenv.env['IP_ADDRESS'];
       final uri = Uri.parse('http://$ipAddress:5001/upload');
       final request = http.MultipartRequest('POST', uri);
 
-      // 임시 디렉토리에서 파일 경로 가져오기
+      // 임시 디렉토리 생성 후 파일을 멀티파트 요청에 추가
       final directory = await getTemporaryDirectory();
       final filePath = '${directory.path}/$_mPath';
-      print("filePath: ${filePath}");
       final file = File(filePath);
-      print("file: ${file}");
-      
       request.files.add(await http.MultipartFile.fromPath('file', file.path));
 
+      // 요청 및 응답을 문자열로 변환
       final response = await request.send();
-      final responseBody = await response.stream.bytesToString(); // 응답 본문 추출
-      print("Response status: ${response.statusCode}");
-      print("Response body: $responseBody['transcription']");
+      final responseBody = await response.stream.bytesToString();
+      
+      // 서버 응답 확인
       if (response.statusCode == 200) {
-        print('File uploaded successfully.');
+        logger.i('File uploaded successfully.');
+
+        // 응답을 JSON으로 변환
         final jsonResponse = jsonDecode(responseBody);
         final transcription = jsonResponse['transcription'];
-        print('Transcription: $transcription');
+
+        // 콜백이 있을 경우 호출
+        if (_transcriptionCallback != null) {
+          _transcriptionCallback!(transcription); 
+        }
       } else {
-        print('Failed to upload file. Status code: ${response.statusCode}');
+        logger.e('Failed to upload file. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error uploading file: $e');
+      logger.e('Error uploading file: $e');
     }
+  }
+
+  void setTranscriptionCallback(TranscriptionCallback callback) {
+    _transcriptionCallback = callback;
   }
 }
