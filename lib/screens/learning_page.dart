@@ -7,17 +7,22 @@ import 'package:juniorvoca/widgets/appbar.dart';
 import 'package:juniorvoca/widgets/bottomnavbar.dart';
 import 'package:juniorvoca/widgets/icon_button.dart';
 import 'package:juniorvoca/widgets/image_card.dart';
+import 'package:juniorvoca/utils/chatgpt_service.dart';
 import 'package:juniorvoca/utils/simple_recorder.dart';
 
 class VocaItem {
   final String image;
   final String word;
   final String meaning;
-
+  String originalSentence;
+  String translatedSentence;
+  
   VocaItem({
     required this.image,
     required this.word,
     required this.meaning,
+    this.originalSentence = '',
+    this.translatedSentence = '',
   });
 
   // Json 데이터를 VocaItem 객체로 변환
@@ -67,6 +72,22 @@ class _LearningPageState extends State<LearningPage> {
     String jsonString = await rootBundle.loadString('assets/words/day1.json');
     final jsonData = jsonDecode(jsonString) as List<dynamic>;
     vocaItems = jsonData.map((item) => VocaItem.fromJson(item as Map<String, dynamic>)).toList();
+
+    final chatGptService = ChatGPTService();
+    
+    // 각 VocaItem 객체에 대해 ChatGPT 활용 문장을 생성 및 처리
+    for (var vocaItem in vocaItems) {
+      String fullSentence = await chatGptService.generateSentence(vocaItem.meaning);
+      List<String> sentences = fullSentence.split('\n');
+      if (sentences.length == 2) {
+        vocaItem.originalSentence = sentences[0].trim();
+        vocaItem.translatedSentence = sentences[1].trim();
+      } else {
+        vocaItem.originalSentence = fullSentence.trim();
+        vocaItem.translatedSentence = "";
+      }
+    }
+
     setState(() {
       _dataLoaded = true;
     });
@@ -127,14 +148,16 @@ class _LearningPageState extends State<LearningPage> {
                       // 예문
                       Column(
                         children: [
-                          const Text(
-                            '어제 연필을 하나 샀어요.',
+                          Text(
+                            vocaItems[index].originalSentence.isNotEmpty
+                                ? vocaItems[index].originalSentence
+                                : 'Loading sentence...',
                             style: AppTheme.body,
                           ),
                           Text(
-                            transcription.isNotEmpty
-                                ? transcription
-                                : 'Recording transcription will appear here',
+                            vocaItems[index].translatedSentence.isNotEmpty
+                                ? vocaItems[index].translatedSentence
+                                : 'Loading sentence...',
                             style: AppTheme.body,
                           ),
                         ],

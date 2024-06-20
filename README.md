@@ -8,6 +8,7 @@ ChatGPT를 활용한 아동용 단어 학습 어플리케이션
 
 ```
 IP_ADDRESS = <YOUR_IP_ADDRESS>
+OPENAI_APIKEY = <YOUR_OPENAI_API_KEY>
 ```
 
 ## R&R
